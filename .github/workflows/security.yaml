@@ -81,7 +81,7 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Setup Tomcat
-        run: python3 dsvpwa.py
+        run: python3 dsvpwa.py &
 
       - name: Prepare ZAP Environment
         run: |
