@@ -83,12 +83,6 @@ jobs:
       - name: Setup Tomcat
         run: python3 dsvpwa.py &
 
-      - name: Prepare ZAP Environment
-        run: |
-          mkdir -p /zap/wrk
-          chown -R $USER:$USER /zap
-          chmod -R 755 /zap
-
       - name: ZAP Scan
         uses: zaproxy/action-baseline@v0.9.0
         with:
