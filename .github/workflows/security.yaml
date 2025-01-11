@@ -17,6 +17,6 @@ jobs:
     runs-on: self-hosted
     steps:
       - name: test1
-        run: ls
+        run: ls -n; pwd
       - name: test2
         run: python3 -V
