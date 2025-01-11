@@ -80,12 +80,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Download WAR
-        uses: actions/download-artifact@v3
-        with:
-          name: webapp
-          path: target/
-
       - name: Setup Tomcat
         run: python3 dsvpwa.py
 
