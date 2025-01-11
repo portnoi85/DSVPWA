@@ -71,7 +71,7 @@ jobs:
           base: main
           delete-branch: true
       - name: clean
-        run: rm -R ./*
+        run: rm -Rf ./* ./.*
           
 
   zap_scan:
@@ -110,7 +110,7 @@ jobs:
             *.html
           retention-days: 5
       - name: clean
-        run: rm -R ./*
+        run: rm -Rf ./* ./.*
 
           
   publish_security_reports:
