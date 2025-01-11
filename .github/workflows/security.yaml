@@ -70,6 +70,9 @@ jobs:
           branch: semgrep-fixes
           base: main
           delete-branch: true
+      - name: clean
+        run: rm -R ./*
+          
 
   zap_scan:
     needs: build
@@ -112,6 +115,10 @@ jobs:
             zap-*
             *.html
           retention-days: 5
+      - name: clean
+        run: rm -R ./*
+
+          
   publish_security_reports:
     needs: [semgrep, zap_scan]
     runs-on: self-hosted
