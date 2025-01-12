@@ -7,7 +7,7 @@
   <build>
     <plugins>
       <plugin>
-        <grouoID>org.owasp</grouoID>
+        <groupID>org.owasp</groupID>
         <artifactID>dependency-check-maven</artifactID>
         <version>8.4.0</version>
       </plugin>
