@@ -14,16 +14,17 @@ permissions:
 
 jobs:
   build:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
         with:
           token: ${{ github.token }}
       - name: test2
         run: python3 -V
+        
   semgrep:
     needs: build
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     container:
       image: returntocorp/semgrep:latest
     steps:
@@ -70,19 +71,21 @@ jobs:
           branch: semgrep-fixes
           base: main
           delete-branch: true
-      - name: clean
-        run: rm -Rf ./* ./.*
-          
+         
 
   zap_scan:
     needs: build
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
 
-      - name: Setup Tomcat
+      - name: Setup
         run: python3 dsvpwa.py &
-
+      - name: Prepare ZAP Environment
+        run: |
+          sudo mkdir -p /zap/wrk
+          sudo chown -R $USER:$USER /zap
+          sudo chmod -R 755 /zap
       - name: ZAP Scan
         uses: zaproxy/action-baseline@v0.9.0
         with:
@@ -103,13 +106,40 @@ jobs:
             zap-*
             *.html
           retention-days: 5
-      - name: clean
-        run: rm -Rf ./* ./.*
 
+  dependency_check:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Create reports directory
+        run: mkdir -p reports
+
+      - name: Run OWASP Dependency Check
+        run: |
+          mvn org.owasp:dependency-check-maven:check \
+          -Dformat=HTML \
+          -DoutputDirectory=reports \
+          -DsuppressionFile=suppression.xml || true
+
+      - name: Upload Dependency Check Results
+        uses: actions/upload-artifact@v3
+        with:
+          name: dependency-check-results
+          path: reports/dependency-check-report.html
+          retention-days: 14
           
   publish_security_reports:
     needs: [semgrep, zap_scan]
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - name: Create reports directory
         run: mkdir -p combined-reports
@@ -135,7 +165,7 @@ jobs:
   cleanup:
     needs: publish_security_reports
     if: always()
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - name: Remove temporary artifacts
         uses: geekyeggo/delete-artifact@v2
